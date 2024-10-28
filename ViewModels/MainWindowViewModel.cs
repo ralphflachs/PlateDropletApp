@@ -48,10 +48,9 @@ namespace PlateDropletApp.ViewModels
 
         public MainWindowViewModel()
         {
-            // Set default droplet threshold directly
-            DropletThreshold = 100;
+            // Load default threshold from config
+            DropletThreshold = int.Parse(ConfigurationManager.AppSettings["DefaultDropletThreshold"] ?? "100");
 
-            // Initialize commands
             BrowseCommand = new DelegateCommand(OnBrowse);
             UpdateThresholdCommand = new DelegateCommand(OnUpdateThreshold);
         }
@@ -89,15 +88,15 @@ namespace PlateDropletApp.ViewModels
                     well.DisplayText = "n";
                     well.IsLowDroplet = false;
                     well.BackgroundColor = "White";
-        }
+                }
                 else
                 {
                     well.DisplayText = "L";
                     well.IsLowDroplet = true;
                     well.BackgroundColor = "Gray";
                     lowDropletCount++;
-    }
-}
+                }
+            }
 
             LowDropletWellCount = lowDropletCount;
         }
