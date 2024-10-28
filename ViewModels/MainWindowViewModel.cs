@@ -70,12 +70,36 @@ namespace PlateDropletApp.ViewModels
 
         private void OnUpdateThreshold()
         {
-            throw new NotImplementedException();
+            if (DropletThreshold < 0 || DropletThreshold > 500)
+                return;
+
+            UpdateWellStatuses();
         }
 
         private void UpdateWellStatuses()
         {
-            throw new NotImplementedException();
+            if (Plate == null) return;
+
+            int lowDropletCount = 0;
+
+            foreach (var well in Plate.Wells)
+            {
+                if (well.DropletCount >= DropletThreshold)
+                {
+                    well.DisplayText = "n";
+                    well.IsLowDroplet = false;
+                    well.BackgroundColor = "White";
+        }
+                else
+                {
+                    well.DisplayText = "L";
+                    well.IsLowDroplet = true;
+                    well.BackgroundColor = "Gray";
+                    lowDropletCount++;
+    }
+}
+
+            LowDropletWellCount = lowDropletCount;
         }
     }
 }
