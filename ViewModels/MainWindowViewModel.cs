@@ -13,6 +13,8 @@ namespace PlateDropletApp.ViewModels
 {
     public class MainWindowViewModel : BindableBase
     {
+        private PlateDataService _plateDataService = new PlateDataService();
+
         private Plate _plate;
         public Plate Plate
         {
@@ -56,7 +58,14 @@ namespace PlateDropletApp.ViewModels
 
         private void OnBrowse()
         {
-            throw new NotImplementedException();
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "JSON files (*.json)|*.json";
+            if (openFileDialog.ShowDialog() == true)
+            {
+                Plate = _plateDataService.LoadPlateData(openFileDialog.FileName);
+                TotalWellCount = Plate.Wells.Count;
+                UpdateWellStatuses();
+            }
         }
 
         private void OnUpdateThreshold()
