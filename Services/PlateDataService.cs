@@ -26,7 +26,6 @@ namespace PlateDropletApp.Services
             }
             catch (Exception ex)
             {
-                // Log the exception or handle it as per your logging strategy
                 throw new ApplicationException("Failed to load plate data.", ex);
             }
         }
