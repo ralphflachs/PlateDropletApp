@@ -4,6 +4,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:viewModels="clr-namespace:PlateDropletApp.ViewModels"
         xmlns:converters="clr-namespace:PlateDropletApp.Converters"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         Title="Plate Droplet Data Display" Height="600" Width="800">
     <Window.Resources>
         <converters:IsLowDropletToBrushConverter x:Key="IsLowDropletToBrushConverter"/>
@@ -23,7 +24,8 @@
         <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,10">
             <Button Content="Select Plate Data" Command="{Binding BrowseCommand}" Width="150" Margin="0,0,10,0"/>
             <TextBlock Text="Droplet Threshold:" VerticalAlignment="Center" Margin="0,0,10,0"/>
-            <TextBox Text="{Binding DropletThreshold, UpdateSourceTrigger=PropertyChanged}" Width="50"/>
+            <xctk:IntegerUpDown Value="{Binding DropletThreshold, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, 
+                NotifyOnValidationError=True}" Width="100" Minimum="0" Maximum="500"/>
             <Button Content="Update" Command="{Binding UpdateThresholdCommand}" Width="100" Margin="10,0,0,0"/>
         </StackPanel>
 
