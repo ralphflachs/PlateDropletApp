@@ -9,6 +9,16 @@
     <Window.Resources>
         <converters:IsLowDropletToBrushConverter x:Key="IsLowDropletToBrushConverter"/>
         <converters:IsLowDropletToDisplayTextConverter x:Key="IsLowDropletToDisplayTextConverter"/>
+        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+        <!-- Define the Validation Error Template -->
+        <ControlTemplate x:Key="ValidationErrorTemplate">
+            <DockPanel LastChildFill="True">
+                <Border BorderBrush="Red" BorderThickness="1">
+                    <AdornedElementPlaceholder/>
+                </Border>
+                <TextBlock Foreground="Red" Margin="5,0,0,0" Text="{Binding [0]}" VerticalAlignment="Center"/>
+            </DockPanel>
+        </ControlTemplate>
     </Window.Resources>
     <Grid Margin="10">
         <Grid.RowDefinitions>
@@ -24,9 +34,11 @@
         <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,10">
             <Button Content="Select Plate Data" Command="{Binding BrowseCommand}" Width="150" Margin="0,0,10,0"/>
             <TextBlock Text="Droplet Threshold:" VerticalAlignment="Center" Margin="0,0,10,0"/>
-            <xctk:IntegerUpDown Value="{Binding DropletThreshold, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, 
-                NotifyOnValidationError=True}" Width="100" Minimum="0" Maximum="500"/>
-            <Button Content="Update" Command="{Binding UpdateThresholdCommand}" Width="100" Margin="10,0,0,0"/>
+            <xctk:IntegerUpDown Value="{Binding DropletThreshold, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}" 
+                                Width="100" Minimum="0" Maximum="500"
+                                Validation.ErrorTemplate="{StaticResource ValidationErrorTemplate}"/>
+            <Button Content="Update" Command="{Binding UpdateThresholdCommand}" Width="100" Margin="10,0,0,0"
+                    IsEnabled="{Binding HasErrors, Converter={StaticResource InverseBooleanConverter}}"/>
         </StackPanel>
 
         <!-- Summary -->
