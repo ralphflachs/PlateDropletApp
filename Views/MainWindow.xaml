@@ -3,10 +3,12 @@
         xmlns:prism="http://prismlibrary.com/"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:viewModels="clr-namespace:PlateDropletApp.ViewModels"
+        xmlns:converters="clr-namespace:PlateDropletApp.Converters"
         Title="Plate Droplet Data Display" Height="600" Width="800">
-    <Window.DataContext>
-        <viewModels:MainWindowViewModel />
-    </Window.DataContext>
+    <Window.Resources>
+        <converters:IsLowDropletToBrushConverter x:Key="IsLowDropletToBrushConverter"/>
+        <converters:IsLowDropletToDisplayTextConverter x:Key="IsLowDropletToDisplayTextConverter"/>
+    </Window.Resources>
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -44,8 +46,8 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Border BorderBrush="Black" BorderThickness="0.5" Background="{Binding BackgroundColor}">
-                            <TextBlock Text="{Binding DisplayText}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <Border BorderBrush="Black" BorderThickness="0.5" Background="{Binding IsLowDroplet, Converter={StaticResource IsLowDropletToBrushConverter}}">
+                            <TextBlock Text="{Binding IsLowDroplet, Converter={StaticResource IsLowDropletToDisplayTextConverter}}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
