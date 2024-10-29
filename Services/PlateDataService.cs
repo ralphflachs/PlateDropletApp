@@ -1,51 +1,62 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
 using PlateDropletApp.Models;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using System.Threading.Tasks;
 
 namespace PlateDropletApp.Services
 {
     public class PlateDataService
     {
-        public Plate LoadPlateData(string filePath)
+        public async Task<Plate> LoadPlateData(string filePath)
         {
-            var json = File.ReadAllText(filePath);
-            var jObject = JObject.Parse(json);
-
-            var wellsArray = jObject["PlateDropletInfo"]["DropletInfo"]["Wells"] as JArray;
-
-            var wells = wellsArray.Select(w => new Well
+            try
             {
-                WellIndex = (int)w["WellIndex"],
-                WellName = (string)w["WellName"],
-                DropletCount = (int)w["DropletCount"]
-            }).ToList();
+                var json = await File.ReadAllTextAsync(filePath);
+                var plateData = JsonConvert.DeserializeObject<PlateData>(json);
 
-            int wellCount = wells.Count;
+                var wells = plateData.PlateDropletInfo.DropletInfo.Wells;
+                int wellCount = wells.Count;
+
+                Plate plate = InitializePlate(wellCount);
+                PopulatePlateWells(plate, wells);
+
+                return plate;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception or handle it as per your logging strategy
+                throw new ApplicationException("Failed to load plate data.", ex);
+            }
+        }
+
+        private Plate InitializePlate(int wellCount)
+        {
             Plate plate = new Plate();
 
-            if (wellCount == 96)
+            switch (wellCount)
             {
-                plate.Rows = 8;
-                plate.Columns = 12;
-            }
-            else if (wellCount == 48)
-            {
-                plate.Rows = 8;
-                plate.Columns = 6;
-            }
-            else
-            {
-                // Handle unexpected well counts
-                plate.Rows = 0;
-                plate.Columns = 0;
+                case 96:
+                    plate.Rows = 8;
+                    plate.Columns = 12;
+                    break;
+                case 48:
+                    plate.Rows = 8;
+                    plate.Columns = 6;
+                    break;
+                default:
+                    throw new InvalidOperationException($"Unsupported well count: {wellCount}");
             }
 
-            // Initialize wells in order
+            return plate;
+        }
+
+        private void PopulatePlateWells(Plate plate, List<Well> wells)
+        {
             for (int i = 0; i < plate.Rows * plate.Columns; i++)
             {
-                var well = wells.FirstOrDefault(w => w.WellIndex == i);
+                var well = wells.Find(w => w.WellIndex == i);
                 if (well == null)
                 {
                     well = new Well
@@ -57,8 +68,6 @@ namespace PlateDropletApp.Services
                 }
                 plate.Wells.Add(well);
             }
-
-            return plate;
         }
 
         private string GetWellName(int index, int columns)
@@ -67,5 +76,21 @@ namespace PlateDropletApp.Services
             int col = (index % columns) + 1;
             return $"{row}{col:D2}";
         }
+    }
+
+    // Model for deserialization
+    public class PlateData
+    {
+        public PlateDropletInfo PlateDropletInfo { get; set; }
+    }
+
+    public class PlateDropletInfo
+    {
+        public DropletInfo DropletInfo { get; set; }
+    }
+
+    public class DropletInfo
+    {
+        public List<Well> Wells { get; set; }
     }
 }
