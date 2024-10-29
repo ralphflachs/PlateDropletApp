@@ -25,8 +25,8 @@ namespace PlateDropletApp.ViewModels
             set => SetProperty(ref _plate, value);
         }
 
-        private int _dropletThreshold;
-        public int DropletThreshold
+        private int? _dropletThreshold;
+        public int? DropletThreshold
         {
             get => _dropletThreshold;
             set
@@ -81,7 +81,7 @@ namespace PlateDropletApp.ViewModels
 
         private void OnUpdateThreshold()
         {
-            if (!HasErrors)
+            if (!HasErrors && DropletThreshold != null)
             {
                 UpdateWellStatuses();
             }
@@ -89,13 +89,13 @@ namespace PlateDropletApp.ViewModels
 
         private void UpdateWellStatuses()
         {
-            if (Plate == null) return;
+            if (Plate == null || DropletThreshold == null) return;
 
             int lowDropletCount = 0;
 
             foreach (var well in Plate.Wells)
             {
-                well.IsLowDroplet = well.DropletCount < DropletThreshold;
+                well.IsLowDroplet = well.DropletCount < DropletThreshold.Value;
                 if (well.IsLowDroplet)
                 {
                     lowDropletCount++;
@@ -105,7 +105,7 @@ namespace PlateDropletApp.ViewModels
             LowDropletWellCount = lowDropletCount;
         }
 
-        #region Threshold Validation
+        #region Validation Implementation
 
         private readonly Dictionary<string, List<string>> _errors = new Dictionary<string, List<string>>();
 
@@ -134,7 +134,11 @@ namespace PlateDropletApp.ViewModels
 
             RemoveError(propertyName); // Clear previous errors
 
-            if (DropletThreshold < minThreshold || DropletThreshold > maxThreshold)
+            if (DropletThreshold == null)
+            {
+                AddError(propertyName, "Threshold cannot be empty.");
+            }
+            else if (DropletThreshold < minThreshold || DropletThreshold > maxThreshold)
             {
                 AddError(propertyName, $"Threshold must be between {minThreshold} and {maxThreshold}.");
             }
