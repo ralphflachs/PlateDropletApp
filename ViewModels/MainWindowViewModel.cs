@@ -2,18 +2,18 @@
 using Prism.Mvvm;
 using PlateDropletApp.Models;
 using PlateDropletApp.Services;
-using Microsoft.Win32;
 using System;
 using System.Collections.ObjectModel;
 using System.Configuration;
-using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace PlateDropletApp.ViewModels
 {
     public class MainWindowViewModel : BindableBase
     {
-        private PlateDataService _plateDataService = new PlateDataService();
+        private readonly PlateDataService _plateDataService;
+        private readonly IFileDialogService _fileDialogService;
 
         private Plate _plate;
         public Plate Plate
@@ -26,7 +26,13 @@ namespace PlateDropletApp.ViewModels
         public int DropletThreshold
         {
             get => _dropletThreshold;
-            set => SetProperty(ref _dropletThreshold, value);
+            set
+            {
+                if (SetProperty(ref _dropletThreshold, value))
+                {
+                    ValidateThreshold();
+                }
+            }
         }
 
         private int _totalWellCount;
@@ -43,25 +49,28 @@ namespace PlateDropletApp.ViewModels
             set => SetProperty(ref _lowDropletWellCount, value);
         }
 
-        public ICommand BrowseCommand { get; set; }
-        public ICommand UpdateThresholdCommand { get; set; }
+        public ICommand BrowseCommand { get; }
+        public ICommand UpdateThresholdCommand { get; }
 
-        public MainWindowViewModel()
+        public MainWindowViewModel(PlateDataService plateDataService, IFileDialogService fileDialogService)
         {
-            // Load default threshold from config
+            _plateDataService = plateDataService;
+            _fileDialogService = fileDialogService;
+
             DropletThreshold = int.Parse(ConfigurationManager.AppSettings["DefaultDropletThreshold"] ?? "100");
 
-            BrowseCommand = new DelegateCommand(OnBrowse);
+            BrowseCommand = new DelegateCommand(async () => await OnBrowseAsync());
             UpdateThresholdCommand = new DelegateCommand(OnUpdateThreshold);
+
+            ValidateThreshold();
         }
 
-        private void OnBrowse()
+        private async Task OnBrowseAsync()
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "JSON files (*.json)|*.json";
-            if (openFileDialog.ShowDialog() == true)
+            var filePath = _fileDialogService.OpenFileDialog();
+            if (!string.IsNullOrEmpty(filePath))
             {
-                Plate = _plateDataService.LoadPlateData(openFileDialog.FileName);
+                Plate = await _plateDataService.LoadPlateData(filePath);
                 TotalWellCount = Plate.Wells.Count;
                 UpdateWellStatuses();
             }
@@ -69,10 +78,20 @@ namespace PlateDropletApp.ViewModels
 
         private void OnUpdateThreshold()
         {
-            if (DropletThreshold < 0 || DropletThreshold > 500)
-                return;
+            if (ValidateThreshold())
+            {
+                UpdateWellStatuses();
+            }
+        }
 
-            UpdateWellStatuses();
+        private bool ValidateThreshold()
+        {
+            if (DropletThreshold < 0 || DropletThreshold > 500)
+            {
+                // Provide feedback to the user, e.g., through a validation message property
+                return false;
+            }
+            return true;
         }
 
         private void UpdateWellStatuses()
@@ -83,17 +102,9 @@ namespace PlateDropletApp.ViewModels
 
             foreach (var well in Plate.Wells)
             {
-                if (well.DropletCount >= DropletThreshold)
+                well.IsLowDroplet = well.DropletCount < DropletThreshold;
+                if (well.IsLowDroplet)
                 {
-                    well.DisplayText = "n";
-                    well.IsLowDroplet = false;
-                    well.BackgroundColor = "White";
-                }
-                else
-                {
-                    well.DisplayText = "L";
-                    well.IsLowDroplet = true;
-                    well.BackgroundColor = "Gray";
                     lowDropletCount++;
                 }
             }
