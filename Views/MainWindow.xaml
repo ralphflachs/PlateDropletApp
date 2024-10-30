@@ -8,12 +8,43 @@
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     Title="Plate Droplet Data Display"
     Width="800"
-    Height="600">
+    Height="600"
+    AllowsTransparency="True"
+    Background="Transparent"
+    ResizeMode="NoResize"
+    WindowStyle="None">
     <Window.Resources>
         <converters:IsLowDropletToBrushConverter x:Key="IsLowDropletToBrushConverter" />
         <converters:IsLowDropletToDisplayTextConverter x:Key="IsLowDropletToDisplayTextConverter" />
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
-        <!--  Define the Validation Error Template  -->
+
+        <!--  Define Header and Paragraph Styles  -->
+        <Style x:Key="HeaderText" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+
+        <Style x:Key="ParagraphText" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+
+        <!--  Standard Button and Border Styles  -->
+        <Style x:Key="StandardButton" TargetType="Button">
+            <Setter Property="Width" Value="350" />
+            <Setter Property="Margin" Value="0,0,0,10" />
+            <Setter Property="HorizontalAlignment" Value="Right" />
+            <Setter Property="FontSize" Value="15" />
+        </Style>
+
+        <Style x:Key="WellBorder" TargetType="Border">
+            <Setter Property="BorderBrush" Value="Black" />
+            <Setter Property="BorderThickness" Value="0.5" />
+        </Style>
+
+        <!--  Validation Error Template  -->
         <ControlTemplate x:Key="ValidationErrorTemplate">
             <DockPanel LastChildFill="True">
                 <Border BorderBrush="Red" BorderThickness="1">
@@ -27,41 +58,37 @@
             </DockPanel>
         </ControlTemplate>
     </Window.Resources>
-    <Grid Margin="10">
-        <Grid.RowDefinitions>
+
+    <Border Background="#372537" CornerRadius="20">
+        <Grid Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
             <!--  Select & Summary  -->
-            <RowDefinition Height="Auto" />
+            <StackPanel Grid.Row="0" Orientation="Vertical">
+                <Button
+                    Command="{Binding BrowseCommand}"
+                    Content="Select Plate Data"
+                    Style="{StaticResource StandardButton}" />
+                <TextBlock Style="{StaticResource HeaderText}" Text="Summary" />
+                <WrapPanel>
+                    <TextBlock Style="{StaticResource ParagraphText}" Text="Total Well Count: " />
+                    <TextBlock Style="{StaticResource ParagraphText}" Text="{Binding TotalWellCount}" />
+                </WrapPanel>
+                <WrapPanel>
+                    <TextBlock Style="{StaticResource ParagraphText}" Text="Total well count with low droplets: " />
+                    <TextBlock Style="{StaticResource ParagraphText}" Text="{Binding LowDropletWellCount}" />
+                </WrapPanel>
+            </StackPanel>
+
             <!--  Plate Grid  -->
-            <RowDefinition Height="*" />
-            <!--  Threshold Set  -->
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-
-        <!--  Select & Summary  -->
-        <StackPanel Grid.Row="0" Orientation="Vertical">
-            <Button
-                Width="350"
-                Margin="0,0,0,10"
-                HorizontalAlignment="Right"
-                Command="{Binding BrowseCommand}"
-                Content="Select Plate Data" />
-            <TextBlock
-                VerticalAlignment="Center"
-                FontWeight="Bold"
-                Text="Summary :" />
-            <WrapPanel>
-                <TextBlock VerticalAlignment="Center" Text="Total Well Count: " />
-                <TextBlock VerticalAlignment="Center" Text="{Binding TotalWellCount}" />
-            </WrapPanel>
-            <WrapPanel>
-                <TextBlock VerticalAlignment="Center" Text="Total well count with low droplets: " />
-                <TextBlock VerticalAlignment="Center" Text="{Binding LowDropletWellCount}" />
-            </WrapPanel>
-        </StackPanel>
-
-        <!--  Plate Grid  -->
-        <ScrollViewer Grid.Row="1" Margin="0,10,0,10">
-            <ItemsControl ItemsSource="{Binding Plate.Wells}">
+            <ItemsControl
+                Grid.Row="1"
+                Margin="0,10,0,10"
+                ItemsSource="{Binding Plate.Wells}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <UniformGrid Columns="{Binding Plate.Columns}" Rows="{Binding Plate.Rows}" />
@@ -69,10 +96,7 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Border
-                            Background="{Binding IsLowDroplet, Converter={StaticResource IsLowDropletToBrushConverter}}"
-                            BorderBrush="Black"
-                            BorderThickness="0.5">
+                        <Border Background="{Binding IsLowDroplet, Converter={StaticResource IsLowDropletToBrushConverter}}" Style="{StaticResource WellBorder}">
                             <TextBlock
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
@@ -81,31 +105,26 @@
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-        </ScrollViewer>
 
-        <!--  Threshold Set  -->
-        <StackPanel
-            Grid.Row="2"
-            Margin="0,0,0,0"
-            Orientation="Vertical">
-            <TextBlock
-                Margin="0,0,10,0"
-                VerticalAlignment="Center"
-                Text="Droplet Threshold:" />
-            <WrapPanel>
-                <xctk:IntegerUpDown
-                    Width="50"
-                    HorizontalAlignment="Left"
-                    Maximum="500"
-                    Minimum="0"
-                    Validation.ErrorTemplate="{StaticResource ValidationErrorTemplate}"
-                    Value="{Binding DropletThreshold, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
-                <Button
-                    HorizontalAlignment="Left"
-                    Command="{Binding UpdateThresholdCommand}"
-                    Content="Update"
-                    IsEnabled="{Binding HasErrors, Converter={StaticResource InverseBooleanConverter}}" />
-            </WrapPanel>
-        </StackPanel>
-    </Grid>
+            <!--  Threshold Set  -->
+            <StackPanel Grid.Row="2" Orientation="Vertical">
+                <TextBlock Style="{StaticResource HeaderText}" Text="Droplet Threshold:" />
+                <WrapPanel>
+                    <xctk:IntegerUpDown
+                        Width="50"
+                        HorizontalAlignment="Left"
+                        Maximum="500"
+                        Minimum="0"
+                        Validation.ErrorTemplate="{StaticResource ValidationErrorTemplate}"
+                        Value="{Binding DropletThreshold, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
+                    <Button
+                        HorizontalAlignment="Left"
+                        Command="{Binding UpdateThresholdCommand}"
+                        Content="Update"
+                        FontSize="15"
+                        IsEnabled="{Binding HasErrors, Converter={StaticResource InverseBooleanConverter}}" />
+                </WrapPanel>
+            </StackPanel>
+        </Grid>
+    </Border>
 </Window>
