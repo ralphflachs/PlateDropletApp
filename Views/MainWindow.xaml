@@ -29,15 +29,17 @@
     </Window.Resources>
     <Grid Margin="10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <!--  Controls  -->
+            <!--  Plate Selector  -->
             <RowDefinition Height="Auto" />
             <!--  Summary  -->
-            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
             <!--  Plate Grid  -->
+            <RowDefinition Height="*" />
+            <!--  Threshold Set  -->
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!--  Controls  -->
+        <!--  Plate Selector  -->
         <StackPanel
             Grid.Row="0"
             Margin="0,0,0,10"
@@ -47,22 +49,6 @@
                 Margin="0,0,10,0"
                 Command="{Binding BrowseCommand}"
                 Content="Select Plate Data" />
-            <TextBlock
-                Margin="0,0,10,0"
-                VerticalAlignment="Center"
-                Text="Droplet Threshold:" />
-            <xctk:IntegerUpDown
-                Width="100"
-                Maximum="500"
-                Minimum="0"
-                Validation.ErrorTemplate="{StaticResource ValidationErrorTemplate}"
-                Value="{Binding DropletThreshold, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
-            <Button
-                Width="100"
-                Margin="10,0,0,0"
-                Command="{Binding UpdateThresholdCommand}"
-                Content="Update"
-                IsEnabled="{Binding HasErrors, Converter={StaticResource InverseBooleanConverter}}" />
         </StackPanel>
 
         <!--  Summary  -->
@@ -109,5 +95,30 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </ScrollViewer>
+
+        <!--  Threshold Set  -->
+        <StackPanel
+            Grid.Row="3"
+            Margin="0,0,0,10"
+            Orientation="Vertical">
+            <TextBlock
+                Margin="0,0,10,0"
+                VerticalAlignment="Center"
+                Text="Droplet Threshold:" />
+            <xctk:IntegerUpDown
+                Width="100"
+                HorizontalAlignment="Left"
+                Maximum="500"
+                Minimum="0"
+                Validation.ErrorTemplate="{StaticResource ValidationErrorTemplate}"
+                Value="{Binding DropletThreshold, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
+            <Button
+                Width="100"
+                Margin="10,0,0,0"
+                HorizontalAlignment="Left"
+                Command="{Binding UpdateThresholdCommand}"
+                Content="Update"
+                IsEnabled="{Binding HasErrors, Converter={StaticResource InverseBooleanConverter}}" />
+        </StackPanel>
     </Grid>
 </Window>
