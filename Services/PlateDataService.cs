@@ -76,20 +76,4 @@ namespace PlateDropletApp.Services
             return $"{row}{col:D2}";
         }
     }
-
-    // Model for deserialization
-    public class PlateData
-    {
-        public PlateDropletInfo PlateDropletInfo { get; set; }
-    }
-
-    public class PlateDropletInfo
-    {
-        public DropletInfo DropletInfo { get; set; }
-    }
-
-    public class DropletInfo
-    {
-        public List<Well> Wells { get; set; }
-    }
 }
