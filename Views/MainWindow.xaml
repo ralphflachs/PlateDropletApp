@@ -31,6 +31,44 @@
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
 
+        <!--  Flat UI Style for Buttons  -->
+        <Style x:Key="FlatButton" TargetType="Button">
+            <Setter Property="Background" Value="#3498db" />
+            <!--  Primary color  -->
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderBrush" Value="#3498db" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <!--  Mouse Over Effect  -->
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#2980b9" />
+                                <!--  Darker shade on hover  -->
+                                <Setter Property="BorderBrush" Value="#2980b9" />
+                            </Trigger>
+                            <!--  Disabled State  -->
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#bdc3c7" />
+                                <!--  Gray for disabled  -->
+                                <Setter Property="BorderBrush" Value="#bdc3c7" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <!--  Standard Button and Border Styles  -->
         <Style x:Key="StandardButton" TargetType="Button">
             <Setter Property="Width" Value="350" />
@@ -70,9 +108,11 @@
             <!--  Select & Summary  -->
             <StackPanel Grid.Row="0" Orientation="Vertical">
                 <Button
+                    Width="200"
+                    HorizontalAlignment="Right"
                     Command="{Binding BrowseCommand}"
                     Content="Select Plate Data"
-                    Style="{StaticResource StandardButton}" />
+                    Style="{StaticResource FlatButton}" />
                 <TextBlock Style="{StaticResource HeaderText}" Text="Summary" />
                 <WrapPanel>
                     <TextBlock Style="{StaticResource ParagraphText}" Text="Total Well Count: " />
@@ -122,7 +162,8 @@
                         Command="{Binding UpdateThresholdCommand}"
                         Content="Update"
                         FontSize="15"
-                        IsEnabled="{Binding HasErrors, Converter={StaticResource InverseBooleanConverter}}" />
+                        IsEnabled="{Binding HasErrors, Converter={StaticResource InverseBooleanConverter}}"
+                        Style="{StaticResource FlatButton}" />
                 </WrapPanel>
             </StackPanel>
         </Grid>
