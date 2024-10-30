@@ -4,10 +4,8 @@ using PlateDropletApp.Models;
 using PlateDropletApp.Services;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -17,6 +15,21 @@ namespace PlateDropletApp.ViewModels
     {
         private readonly PlateDataService _plateDataService;
         private readonly IFileDialogService _fileDialogService;
+        private readonly ErrorsContainer<string> _errorsContainer;
+
+        public MainWindowViewModel(PlateDataService plateDataService, IFileDialogService fileDialogService)
+        {
+            _plateDataService = plateDataService;
+            _fileDialogService = fileDialogService;
+            _errorsContainer = new ErrorsContainer<string>(OnErrorsChanged);
+
+            DropletThreshold = GetDefaultDropletThreshold();
+
+            BrowseCommand = new DelegateCommand(async () => await OnBrowseAsync());
+            UpdateThresholdCommand = new DelegateCommand(OnUpdateThreshold);
+
+            ValidateThreshold();
+        }
 
         private Plate _plate;
         public Plate Plate
@@ -54,19 +67,6 @@ namespace PlateDropletApp.ViewModels
 
         public ICommand BrowseCommand { get; }
         public ICommand UpdateThresholdCommand { get; }
-
-        public MainWindowViewModel(PlateDataService plateDataService, IFileDialogService fileDialogService)
-        {
-            _plateDataService = plateDataService;
-            _fileDialogService = fileDialogService;
-
-            DropletThreshold = GetDefaultDropletThreshold();
-
-            BrowseCommand = new DelegateCommand(async () => await OnBrowseAsync());
-            UpdateThresholdCommand = new DelegateCommand(OnUpdateThreshold);
-
-            ValidateThreshold();
-        }
 
         private int GetDefaultDropletThreshold()
         {
@@ -120,19 +120,11 @@ namespace PlateDropletApp.ViewModels
 
         #region Validation Implementation
 
-        private readonly Dictionary<string, List<string>> _errors = new Dictionary<string, List<string>>();
-
-        public bool HasErrors => _errors.Any();
+        public bool HasErrors => _errorsContainer.HasErrors;
 
         public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
 
-        public IEnumerable GetErrors(string propertyName)
-        {
-            if (string.IsNullOrEmpty(propertyName))
-                return null;
-
-            return _errors.ContainsKey(propertyName) ? _errors[propertyName] : null;
-        }
+        public IEnumerable GetErrors(string propertyName) => _errorsContainer.GetErrors(propertyName);
 
         private void OnErrorsChanged(string propertyName)
         {
@@ -143,40 +135,16 @@ namespace PlateDropletApp.ViewModels
         {
             const int minThreshold = 0;
             const int maxThreshold = 500;
-            const string propertyName = nameof(DropletThreshold);
 
-            RemoveError(propertyName); // Clear previous errors
+            _errorsContainer.ClearErrors(nameof(DropletThreshold));
 
             if (DropletThreshold == null)
             {
-                AddError(propertyName, "Threshold cannot be empty.");
+                _errorsContainer.SetErrors(nameof(DropletThreshold), new[] { "Threshold cannot be empty." });
             }
             else if (DropletThreshold < minThreshold || DropletThreshold > maxThreshold)
             {
-                AddError(propertyName, $"Threshold must be between {minThreshold} and {maxThreshold}.");
-            }
-        }
-
-        private void AddError(string propertyName, string error)
-        {
-            if (!_errors.ContainsKey(propertyName))
-            {
-                _errors[propertyName] = new List<string>();
-            }
-
-            if (!_errors[propertyName].Contains(error))
-            {
-                _errors[propertyName].Add(error);
-                OnErrorsChanged(propertyName);
-            }
-        }
-
-        private void RemoveError(string propertyName)
-        {
-            if (_errors.ContainsKey(propertyName))
-            {
-                _errors.Remove(propertyName);
-                OnErrorsChanged(propertyName);
+                _errorsContainer.SetErrors(nameof(DropletThreshold), new[] { $"Threshold must be between {minThreshold} and {maxThreshold}." });
             }
         }
 
