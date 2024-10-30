@@ -29,9 +29,7 @@
     </Window.Resources>
     <Grid Margin="10">
         <Grid.RowDefinitions>
-            <!--  Plate Selector  -->
-            <RowDefinition Height="Auto" />
-            <!--  Summary  -->
+            <!--  Select & Summary  -->
             <RowDefinition Height="Auto" />
             <!--  Plate Grid  -->
             <RowDefinition Height="*" />
@@ -39,41 +37,30 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!--  Plate Selector  -->
-        <StackPanel
-            Grid.Row="0"
-            Margin="0,0,0,10"
-            Orientation="Horizontal">
+        <!--  Select & Summary  -->
+        <StackPanel Grid.Row="0" Orientation="Vertical">
             <Button
-                Width="150"
-                Margin="0,0,10,0"
+                Width="350"
+                Margin="0,0,0,10"
+                HorizontalAlignment="Right"
                 Command="{Binding BrowseCommand}"
                 Content="Select Plate Data" />
-        </StackPanel>
-
-        <!--  Summary  -->
-        <StackPanel
-            Grid.Row="1"
-            Margin="0,0,0,10"
-            Orientation="Horizontal">
             <TextBlock
                 VerticalAlignment="Center"
                 FontWeight="Bold"
                 Text="Summary :" />
-            <TextBlock
-                Margin="10,0,0,0"
-                VerticalAlignment="Center"
-                Text="Total Well Count: " />
-            <TextBlock VerticalAlignment="Center" Text="{Binding TotalWellCount}" />
-            <TextBlock
-                Margin="10,0,0,0"
-                VerticalAlignment="Center"
-                Text="Total well count with low droplets: " />
-            <TextBlock VerticalAlignment="Center" Text="{Binding LowDropletWellCount}" />
+            <WrapPanel>
+                <TextBlock VerticalAlignment="Center" Text="Total Well Count: " />
+                <TextBlock VerticalAlignment="Center" Text="{Binding TotalWellCount}" />
+            </WrapPanel>
+            <WrapPanel>
+                <TextBlock VerticalAlignment="Center" Text="Total well count with low droplets: " />
+                <TextBlock VerticalAlignment="Center" Text="{Binding LowDropletWellCount}" />
+            </WrapPanel>
         </StackPanel>
 
         <!--  Plate Grid  -->
-        <ScrollViewer Grid.Row="2">
+        <ScrollViewer Grid.Row="1" Margin="0,10,0,10">
             <ItemsControl ItemsSource="{Binding Plate.Wells}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -98,27 +85,27 @@
 
         <!--  Threshold Set  -->
         <StackPanel
-            Grid.Row="3"
-            Margin="0,0,0,10"
+            Grid.Row="2"
+            Margin="0,0,0,0"
             Orientation="Vertical">
             <TextBlock
                 Margin="0,0,10,0"
                 VerticalAlignment="Center"
                 Text="Droplet Threshold:" />
-            <xctk:IntegerUpDown
-                Width="100"
-                HorizontalAlignment="Left"
-                Maximum="500"
-                Minimum="0"
-                Validation.ErrorTemplate="{StaticResource ValidationErrorTemplate}"
-                Value="{Binding DropletThreshold, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
-            <Button
-                Width="100"
-                Margin="10,0,0,0"
-                HorizontalAlignment="Left"
-                Command="{Binding UpdateThresholdCommand}"
-                Content="Update"
-                IsEnabled="{Binding HasErrors, Converter={StaticResource InverseBooleanConverter}}" />
+            <WrapPanel>
+                <xctk:IntegerUpDown
+                    Width="50"
+                    HorizontalAlignment="Left"
+                    Maximum="500"
+                    Minimum="0"
+                    Validation.ErrorTemplate="{StaticResource ValidationErrorTemplate}"
+                    Value="{Binding DropletThreshold, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
+                <Button
+                    HorizontalAlignment="Left"
+                    Command="{Binding UpdateThresholdCommand}"
+                    Content="Update"
+                    IsEnabled="{Binding HasErrors, Converter={StaticResource InverseBooleanConverter}}" />
+            </WrapPanel>
         </StackPanel>
     </Grid>
 </Window>
