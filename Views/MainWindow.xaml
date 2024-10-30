@@ -21,22 +21,22 @@
         <!--  Define Header and Paragraph Styles  -->
         <Style x:Key="HeaderText" TargetType="TextBlock">
             <Setter Property="FontSize" Value="20" />
-            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Foreground" Value="DarkSlateGray" />
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
 
         <Style x:Key="ParagraphText" TargetType="TextBlock">
             <Setter Property="FontSize" Value="14" />
-            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Foreground" Value="DarkSlateGray" />
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
 
         <!--  Flat UI Style for Buttons  -->
         <Style x:Key="FlatButton" TargetType="Button">
-            <Setter Property="Background" Value="#3498db" />
+            <Setter Property="Background" Value="SteelBlue " />
             <!--  Primary color  -->
             <Setter Property="Foreground" Value="White" />
-            <Setter Property="BorderBrush" Value="#3498db" />
+            <Setter Property="BorderBrush" Value="SteelBlue " />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="FontSize" Value="20" />
             <Setter Property="Cursor" Value="Hand" />
@@ -52,9 +52,9 @@
                         <ControlTemplate.Triggers>
                             <!--  Mouse Over Effect  -->
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#2980b9" />
+                                <Setter Property="Background" Value="LightSteelBlue" />
                                 <!--  Darker shade on hover  -->
-                                <Setter Property="BorderBrush" Value="#2980b9" />
+                                <Setter Property="BorderBrush" Value="LightSteelBlue" />
                             </Trigger>
                             <!--  Disabled State  -->
                             <Trigger Property="IsEnabled" Value="False">
@@ -69,16 +69,9 @@
             </Setter>
         </Style>
 
-        <!--  Standard Button and Border Styles  -->
-        <Style x:Key="StandardButton" TargetType="Button">
-            <Setter Property="Width" Value="350" />
-            <Setter Property="Margin" Value="0,0,0,10" />
-            <Setter Property="HorizontalAlignment" Value="Right" />
-            <Setter Property="FontSize" Value="15" />
-        </Style>
-
+        <!--  Border Style for Wells  -->
         <Style x:Key="WellBorder" TargetType="Border">
-            <Setter Property="BorderBrush" Value="Black" />
+            <Setter Property="BorderBrush" Value="SlateGray" />
             <Setter Property="BorderThickness" Value="0.5" />
         </Style>
 
@@ -97,7 +90,7 @@
         </ControlTemplate>
     </Window.Resources>
 
-    <Border Background="#372537" CornerRadius="20">
+    <Border Background="Lavender">
         <Grid Margin="10">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
