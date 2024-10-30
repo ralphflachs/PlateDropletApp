@@ -16,6 +16,9 @@ namespace PlateDropletApp.Services
                 var json = await File.ReadAllTextAsync(filePath);
                 var plateData = JsonConvert.DeserializeObject<PlateData>(json);
 
+                if (plateData?.PlateDropletInfo?.DropletInfo?.Wells == null)
+                    throw new InvalidDataException("Invalid plate data format.");
+
                 var wells = plateData.PlateDropletInfo.DropletInfo.Wells;
                 int wellCount = wells.Count;
 
@@ -23,6 +26,14 @@ namespace PlateDropletApp.Services
                 PopulatePlateWells(plate, wells);
 
                 return plate;
+            }
+            catch (IOException ex)
+            {
+                throw new ApplicationException("An error occurred while reading the file.", ex);
+            }
+            catch (JsonException ex)
+            {
+                throw new ApplicationException("An error occurred while parsing the plate data.", ex);
             }
             catch (Exception ex)
             {
