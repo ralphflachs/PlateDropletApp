@@ -13,6 +13,9 @@ namespace PlateDropletApp.ViewModels
 {
     public class MainWindowViewModel : BindableBase, INotifyDataErrorInfo
     {
+        private const int MinThreshold = 0;
+        private const int MaxThreshold = 500;
+
         private readonly PlateDataService _plateDataService;
         private readonly IFileDialogService _fileDialogService;
         private readonly ErrorsContainer<string> _errorsContainer;
@@ -133,18 +136,15 @@ namespace PlateDropletApp.ViewModels
 
         private void ValidateThreshold()
         {
-            const int minThreshold = 0;
-            const int maxThreshold = 500;
-
             _errorsContainer.ClearErrors(nameof(DropletThreshold));
 
             if (DropletThreshold == null)
             {
                 _errorsContainer.SetErrors(nameof(DropletThreshold), new[] { "Threshold cannot be empty." });
             }
-            else if (DropletThreshold < minThreshold || DropletThreshold > maxThreshold)
+            else if (DropletThreshold < MinThreshold || DropletThreshold > MaxThreshold)
             {
-                _errorsContainer.SetErrors(nameof(DropletThreshold), new[] { $"Threshold must be between {minThreshold} and {maxThreshold}." });
+                _errorsContainer.SetErrors(nameof(DropletThreshold), new[] { $"Threshold must be between {MinThreshold} and {MaxThreshold}." });
             }
         }
 
