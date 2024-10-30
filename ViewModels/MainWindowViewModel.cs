@@ -25,7 +25,7 @@ namespace PlateDropletApp.ViewModels
 
             DropletThreshold = GetDefaultDropletThreshold();
 
-            BrowseCommand = new DelegateCommand(async () => await OnBrowseAsync());
+            BrowseCommand = new AsyncDelegateCommand(async () => await OnBrowseAsync());
             UpdateThresholdCommand = new DelegateCommand(OnUpdateThreshold);
 
             ValidateThreshold();
