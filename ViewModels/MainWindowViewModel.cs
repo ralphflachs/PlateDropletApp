@@ -60,12 +60,25 @@ namespace PlateDropletApp.ViewModels
             _plateDataService = plateDataService;
             _fileDialogService = fileDialogService;
 
-            DropletThreshold = int.Parse(ConfigurationManager.AppSettings["DefaultDropletThreshold"] ?? "100");
+            DropletThreshold = GetDefaultDropletThreshold();
 
             BrowseCommand = new DelegateCommand(async () => await OnBrowseAsync());
             UpdateThresholdCommand = new DelegateCommand(OnUpdateThreshold);
 
             ValidateThreshold();
+        }
+
+        private int GetDefaultDropletThreshold()
+        {
+            int defaultThreshold = 100; // Fallback value
+            string thresholdValue = ConfigurationManager.AppSettings["DefaultDropletThreshold"];
+
+            if (int.TryParse(thresholdValue, out int parsedValue))
+            {
+                return parsedValue;
+            }
+
+            return defaultThreshold;
         }
 
         private async Task OnBrowseAsync()
