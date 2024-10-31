@@ -159,10 +159,8 @@
                         Width="50"
                         HorizontalAlignment="Left"
                         FontSize="15"
-                        Maximum="500"
-                        Minimum="0"
-                        Validation.ErrorTemplate="{StaticResource ValidationErrorTemplate}"
-                        Value="{Binding DropletThreshold, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
+                        Text="{Binding DropletThresholdText, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}"
+                        Validation.ErrorTemplate="{StaticResource ValidationErrorTemplate}" />
                     <Button
                         Width="100"
                         Margin="5,0,0,0"

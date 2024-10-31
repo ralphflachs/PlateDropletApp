@@ -26,12 +26,12 @@ namespace PlateDropletApp.ViewModels
             _fileDialogService = fileDialogService;
             _errorsContainer = new ErrorsContainer<string>(OnErrorsChanged);
 
-            DropletThreshold = GetDefaultDropletThreshold();
+            DropletThresholdText = GetDefaultDropletThreshold().ToString();
 
             BrowseCommand = new AsyncDelegateCommand(async () => await OnBrowseAsync());
             UpdateThresholdCommand = new DelegateCommand(OnUpdateThreshold);
 
-            ValidateThreshold();
+            ValidateDropletThreshold();
         }
 
         private Plate _plate;
@@ -41,15 +41,15 @@ namespace PlateDropletApp.ViewModels
             set => SetProperty(ref _plate, value);
         }
 
-        private int? _dropletThreshold;
-        public int? DropletThreshold
+        private string _dropletThresholdText;
+        public string DropletThresholdText
         {
-            get => _dropletThreshold;
+            get => _dropletThresholdText;
             set
             {
-                if (SetProperty(ref _dropletThreshold, value))
+                if (SetProperty(ref _dropletThresholdText, value))
                 {
-                    ValidateThreshold();
+                    ValidateDropletThreshold();
                 }
             }
         }
@@ -97,7 +97,7 @@ namespace PlateDropletApp.ViewModels
 
         private void OnUpdateThreshold()
         {
-            if (!HasErrors && DropletThreshold != null)
+            if (!HasErrors)
             {
                 UpdateWellStatuses();
             }
@@ -105,13 +105,13 @@ namespace PlateDropletApp.ViewModels
 
         private void UpdateWellStatuses()
         {
-            if (Plate == null || DropletThreshold == null) return;
+            if (Plate == null || !int.TryParse(DropletThresholdText, out int thresholdValue)) return;
 
             int lowDropletCount = 0;
 
             foreach (var well in Plate.Wells)
             {
-                well.IsLowDroplet = well.DropletCount < DropletThreshold.Value;
+                well.IsLowDroplet = well.DropletCount < thresholdValue;
                 if (well.IsLowDroplet)
                 {
                     lowDropletCount++;
@@ -134,17 +134,18 @@ namespace PlateDropletApp.ViewModels
             ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
         }
 
-        private void ValidateThreshold()
+        private void ValidateDropletThreshold()
         {
-            _errorsContainer.ClearErrors(nameof(DropletThreshold));
+            _errorsContainer.ClearErrors(nameof(DropletThresholdText));
 
-            if (DropletThreshold == null)
+            if (string.IsNullOrWhiteSpace(DropletThresholdText))
             {
-                _errorsContainer.SetErrors(nameof(DropletThreshold), new[] { "Threshold cannot be empty." });
+                _errorsContainer.SetErrors(nameof(DropletThresholdText), new[] { "Threshold cannot be empty." });
             }
-            else if (DropletThreshold < MinThreshold || DropletThreshold > MaxThreshold)
+            else if (!int.TryParse(DropletThresholdText, out int thresholdValue) ||
+                     thresholdValue < MinThreshold || thresholdValue > MaxThreshold)
             {
-                _errorsContainer.SetErrors(nameof(DropletThreshold), new[] { $"Threshold must be between {MinThreshold} and {MaxThreshold}." });
+                _errorsContainer.SetErrors(nameof(DropletThresholdText), new[] { $"Threshold must be a number between {MinThreshold} and {MaxThreshold}." });
             }
         }
 
