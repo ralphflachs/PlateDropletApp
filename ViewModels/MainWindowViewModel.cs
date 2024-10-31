@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Configuration;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Collections.ObjectModel;
 
 namespace PlateDropletApp.ViewModels
 {
@@ -33,6 +34,8 @@ namespace PlateDropletApp.ViewModels
 
             ValidateDropletThreshold();
         }
+
+        #region Properties
 
         private Plate _plate;
         public Plate Plate
@@ -68,6 +71,11 @@ namespace PlateDropletApp.ViewModels
             set => SetProperty(ref _lowDropletWellCount, value);
         }
 
+        #endregion
+
+        public ObservableCollection<string> ColumnHeaders { get; set; }
+        public ObservableCollection<RowViewModel> PlateRows { get; set; }
+
         public ICommand BrowseCommand { get; }
         public ICommand UpdateThresholdCommand { get; }
 
@@ -91,6 +99,8 @@ namespace PlateDropletApp.ViewModels
             {
                 Plate = await _plateDataService.LoadPlateData(filePath);
                 TotalWellCount = Plate.Wells.Count;
+
+                InitializeHeadersAndRows();
                 UpdateWellStatuses();
             }
         }
@@ -103,18 +113,51 @@ namespace PlateDropletApp.ViewModels
             }
         }
 
+        private void InitializeHeadersAndRows()
+        {
+            // Initialize ColumnHeaders
+            ColumnHeaders = new ObservableCollection<string>();
+            for (int i = 0; i < Plate.Columns; i++)
+            {
+                char colHeader = (char)('A' + i);
+                ColumnHeaders.Add(colHeader.ToString());
+            }
+            RaisePropertyChanged(nameof(ColumnHeaders));
+
+            // Initialize PlateRows
+            PlateRows = new ObservableCollection<RowViewModel>();
+            for (int row = 0; row < Plate.Rows; row++)
+            {
+                var rowWells = new ObservableCollection<Well>();
+                for (int col = 0; col < Plate.Columns; col++)
+                {
+                    int index = row * Plate.Columns + col;
+                    rowWells.Add(Plate.Wells[index]);
+                }
+                PlateRows.Add(new RowViewModel
+                {
+                    RowHeader = (row + 1).ToString(),
+                    Cells = rowWells
+                });
+            }
+            RaisePropertyChanged(nameof(PlateRows));
+        }
+
         private void UpdateWellStatuses()
         {
             if (Plate == null || !int.TryParse(DropletThresholdText, out int thresholdValue)) return;
 
             int lowDropletCount = 0;
 
-            foreach (var well in Plate.Wells)
+            foreach (var row in PlateRows)
             {
-                well.IsLowDroplet = well.DropletCount < thresholdValue;
-                if (well.IsLowDroplet)
+                foreach (var well in row.Cells)
                 {
-                    lowDropletCount++;
+                    well.IsLowDroplet = well.DropletCount < thresholdValue;
+                    if (well.IsLowDroplet)
+                    {
+                        lowDropletCount++;
+                    }
                 }
             }
 
