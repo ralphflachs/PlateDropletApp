@@ -9,10 +9,9 @@
     Title="Plate Droplet Data Display"
     Width="800"
     Height="600"
-    AllowsTransparency="True"
+    AllowsTransparency="False"
     Background="Transparent"
-    ResizeMode="NoResize"
-    WindowStyle="None">
+    WindowStyle="SingleBorderWindow">
     <Window.Resources>
         <converters:IsLowDropletToBrushConverter x:Key="IsLowDropletToBrushConverter" />
         <converters:IsLowDropletToDisplayTextConverter x:Key="IsLowDropletToDisplayTextConverter" />
