@@ -15,9 +15,10 @@ using IDialogService = PlateDropletApp.Services.IDialogService;
 namespace PlateDropletApp.ViewModels
 {
     public class MainWindowViewModel : BindableBase, INotifyDataErrorInfo
-    {
+    {        
         private const int MinThreshold = 0;
         private const int MaxThreshold = 500;
+        private const int DefaultFallbackThreshold = 100;
 
         private readonly PlateDataService _plateDataService;
         private readonly IFileDialogService _fileDialogService;
@@ -85,7 +86,6 @@ namespace PlateDropletApp.ViewModels
 
         private int GetDefaultDropletThreshold()
         {
-            int defaultThreshold = 100; // Fallback value
             string thresholdValue = ConfigurationManager.AppSettings["DefaultDropletThreshold"];
 
             if (int.TryParse(thresholdValue, out int parsedValue))
@@ -93,7 +93,7 @@ namespace PlateDropletApp.ViewModels
                 return parsedValue;
             }
 
-            return defaultThreshold;
+            return DefaultFallbackThreshold;
         }
 
         private async Task OnBrowseAsync()
@@ -110,20 +110,16 @@ namespace PlateDropletApp.ViewModels
                     UpdateWellStatuses();
                 }
                 catch (InvalidDataException ex)
-                {
-                    // Display validation errors from PlateDataService
+                {                    
                     await _dialogService.ShowMessageAsync("Data Validation Error", ex.Message);
                 }
                 catch (ApplicationException ex)
-                {
-                    // Display application-related errors
+                {                    
                     await _dialogService.ShowMessageAsync("Application Error", ex.Message);
                 }
                 catch (Exception ex)
-                {
-                    // Handle any unexpected errors
+                {                    
                     await _dialogService.ShowMessageAsync("Unexpected Error", "An unexpected error occurred while loading the plate data.");
-                    // Optionally log the exception details for debugging
                 }
             }
         }
