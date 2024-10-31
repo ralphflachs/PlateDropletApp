@@ -62,35 +62,12 @@ The project relies on several NuGet packages. You can restore these packages usi
 
 ---
 
-## Project Structure
-
-```
-PlateDropletApp/
-├── Models/
-│   ├── Plate.cs
-│   └── Well.cs
-├── Services/
-│   ├── PlateDataService.cs
-│   └── IFileDialogService.cs
-├── ViewModels/
-│   └── MainWindowViewModel.cs
-├── Views/
-│   ├── MainWindow.xaml
-│   └── MainWindow.xaml.cs
-├── Converters/
-│   ├── IsLowDropletToBrushConverter.cs
-│   └── IsLowDropletToDisplayTextConverter.cs
-├── App.xaml
-├── App.xaml.cs
-├── PlateDropletApp.csproj
-└── README.md
-```
-
-- **Models**: Contains data models (`Plate`, `Well`).
-- **Services**: Contains service classes (`PlateDataService`, `IFileDialogService`).
+- **Models**: Contains data models (`Plate`, ...).
+- **Services**: Contains service classes (`PlateDataService`, ...).
 - **ViewModels**: Contains ViewModel classes following MVVM pattern.
 - **Views**: Contains XAML views and their code-behind files.
 - **Converters**: Contains value converters for data binding in XAML.
+- **Resources**: Contains styles for views.
 - **App.xaml**: Application definition.
 - **App.xaml.cs**: Application startup logic.
 
@@ -130,4 +107,3 @@ The application uses an `App.config` file to store configuration settings.
 
 - **Data Format**: Ensure your JSON data files match the expected format for successful parsing.
 - **Plate Dimensions**: The application supports plates with 96 or 48 wells. Other well counts will result in an error.
-- **Asynchronous Operations**: The application performs file I/O operations asynchronously to maintain UI responsiveness.
