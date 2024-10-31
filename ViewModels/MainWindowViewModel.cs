@@ -132,6 +132,7 @@ namespace PlateDropletApp.ViewModels
         private void OnErrorsChanged(string propertyName)
         {
             ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
+            RaisePropertyChanged(nameof(HasErrors));
         }
 
         private void ValidateDropletThreshold()
