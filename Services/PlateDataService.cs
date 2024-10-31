@@ -17,7 +17,7 @@ namespace PlateDropletApp.Services
                 var plateData = JsonConvert.DeserializeObject<PlateData>(json);
 
                 if (plateData?.PlateDropletInfo?.DropletInfo?.Wells == null)
-                    throw new InvalidDataException("Invalid plate data format.");
+                    throw new InvalidDataException("Invalid plate data format: Wells information is missing.");
 
                 var wells = plateData.PlateDropletInfo.DropletInfo.Wells;
                 int wellCount = wells.Count;
@@ -66,16 +66,18 @@ namespace PlateDropletApp.Services
         {
             for (int i = 0; i < plate.Rows * plate.Columns; i++)
             {
-                var well = wells.Find(w => w.WellIndex == i);
-                if (well == null)
+                var well = wells.Find(w => w.WellIndex == i) ?? throw new InvalidDataException($"Well at index {i} is null.");
+
+                // Compute the expected well name
+                string expectedName = GetWellName(i, plate.Columns);
+
+                // Validate the well name
+                if (!string.Equals(well.WellName, expectedName, StringComparison.OrdinalIgnoreCase))
                 {
-                    well = new Well
-                    {
-                        WellIndex = i,
-                        WellName = GetWellName(i, plate.Columns),
-                        DropletCount = 0
-                    };
+                    throw new InvalidDataException(
+                        $"Well name mismatch at index {i}: expected '{expectedName}', but found '{well.WellName}'.");
                 }
+                
                 plate.Wells.Add(well);
             }
         }
