@@ -80,18 +80,10 @@
         <Setter Property="VerticalAlignment" Value="Stretch" />
     </Style>
 
-    <!--  Validation Error Template  -->
-    <ControlTemplate x:Key="ValidationErrorTemplate">
-        <DockPanel LastChildFill="True">
-            <Border BorderBrush="DarkRed" BorderThickness="1">
-                <AdornedElementPlaceholder />
-            </Border>
-            <TextBlock
-                Margin="120,0,0,0"
-                VerticalAlignment="Center"
-                FontSize="15"
-                Foreground="DarkRed"
-                Text="{Binding [0].ErrorContent}" />
-        </DockPanel>
-    </ControlTemplate>
+    <!--  TextBlock style for validation error messages  -->
+    <Style x:Key="ValidationErrorTextBlockStyle" TargetType="TextBlock">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="Foreground" Value="DarkRed" />
+    </Style>
 </ResourceDictionary>

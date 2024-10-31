@@ -13,6 +13,19 @@
     <!--  Merge the external resource dictionary  -->
     <Window.Resources>
         <ResourceDictionary>
+            <!--  Validation Error Template  -->
+            <ControlTemplate x:Key="ValidationErrorTemplate">
+                <DockPanel LastChildFill="True">
+                    <Border BorderBrush="DarkRed" BorderThickness="1">
+                        <AdornedElementPlaceholder />
+                    </Border>
+                    <TextBlock
+                        Margin="120,0,0,0"
+                        Style="{StaticResource ValidationErrorTextBlockStyle}"
+                        Text="{Binding [0].ErrorContent}" />
+                </DockPanel>
+            </ControlTemplate>
+
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../Resources/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
