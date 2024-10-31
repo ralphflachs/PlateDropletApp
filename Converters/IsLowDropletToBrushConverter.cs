@@ -7,8 +7,8 @@ namespace PlateDropletApp.Converters
 {
     public class IsLowDropletToBrushConverter : IValueConverter
     {
-        private static readonly Brush LowDropletBrush = Brushes.Gray;
-        private static readonly Brush NormalBrush = Brushes.White;
+        private static readonly Brush LowDropletBrush = Brushes.LightSlateGray;
+        private static readonly Brush NormalBrush = Brushes.AliceBlue;
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

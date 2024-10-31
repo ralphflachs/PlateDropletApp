@@ -69,10 +69,21 @@
             </Setter>
         </Style>
 
-        <!--  Border Style for Wells  -->
+        <!--  Well Border Style with Shadow Effect  -->
         <Style x:Key="WellBorder" TargetType="Border">
             <Setter Property="BorderBrush" Value="SlateGray" />
-            <Setter Property="BorderThickness" Value="0.5" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect
+                        BlurRadius="5"
+                        Direction="315"
+                        Opacity="0.3"
+                        ShadowDepth="3"
+                        Color="Black" />
+                </Setter.Value>
+            </Setter>
         </Style>
 
         <!--  Validation Error Template  -->
@@ -133,6 +144,7 @@
                             <TextBlock
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
+                                FontSize="15"
                                 Text="{Binding IsLowDroplet, Converter={StaticResource IsLowDropletToDisplayTextConverter}}" />
                         </Border>
                     </DataTemplate>
