@@ -89,13 +89,14 @@
         <!--  Validation Error Template  -->
         <ControlTemplate x:Key="ValidationErrorTemplate">
             <DockPanel LastChildFill="True">
-                <Border BorderBrush="Red" BorderThickness="1">
+                <Border BorderBrush="DarkRed" BorderThickness="1">
                     <AdornedElementPlaceholder />
                 </Border>
                 <TextBlock
-                    Margin="50,0,0,0"
+                    Margin="120,0,0,0"
                     VerticalAlignment="Center"
-                    Foreground="Red"
+                    FontSize="15"
+                    Foreground="DarkRed"
                     Text="{Binding [0].ErrorContent}" />
             </DockPanel>
         </ControlTemplate>
@@ -158,15 +159,17 @@
                     <xctk:IntegerUpDown
                         Width="50"
                         HorizontalAlignment="Left"
+                        FontSize="15"
                         Maximum="500"
                         Minimum="0"
                         Validation.ErrorTemplate="{StaticResource ValidationErrorTemplate}"
                         Value="{Binding DropletThreshold, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
                     <Button
+                        Width="100"
+                        Margin="5,0,0,0"
                         HorizontalAlignment="Left"
                         Command="{Binding UpdateThresholdCommand}"
                         Content="Update"
-                        FontSize="15"
                         IsEnabled="{Binding HasErrors, Converter={StaticResource InverseBooleanConverter}}"
                         Style="{StaticResource FlatButton}" />
                 </WrapPanel>
