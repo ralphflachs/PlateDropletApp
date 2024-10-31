@@ -9,6 +9,8 @@ using System.Configuration;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Collections.ObjectModel;
+using System.IO;
+using IDialogService = PlateDropletApp.Services.IDialogService;
 
 namespace PlateDropletApp.ViewModels
 {
@@ -19,12 +21,14 @@ namespace PlateDropletApp.ViewModels
 
         private readonly PlateDataService _plateDataService;
         private readonly IFileDialogService _fileDialogService;
+        private readonly IDialogService _dialogService;
         private readonly ErrorsContainer<string> _errorsContainer;
 
-        public MainWindowViewModel(PlateDataService plateDataService, IFileDialogService fileDialogService)
+        public MainWindowViewModel(PlateDataService plateDataService, IFileDialogService fileDialogService, IDialogService dialogService)
         {
             _plateDataService = plateDataService;
             _fileDialogService = fileDialogService;
+            _dialogService = dialogService;
             _errorsContainer = new ErrorsContainer<string>(OnErrorsChanged);
 
             DropletThresholdText = GetDefaultDropletThreshold().ToString();
@@ -97,11 +101,30 @@ namespace PlateDropletApp.ViewModels
             var filePath = _fileDialogService.OpenFileDialog();
             if (!string.IsNullOrEmpty(filePath))
             {
-                Plate = await _plateDataService.LoadPlateData(filePath);
-                TotalWellCount = Plate.Wells.Count;
+                try
+                {
+                    Plate = await _plateDataService.LoadPlateData(filePath);
+                    TotalWellCount = Plate.Wells.Count;
 
-                InitializeHeadersAndRows();
-                UpdateWellStatuses();
+                    InitializeHeadersAndRows();
+                    UpdateWellStatuses();
+                }
+                catch (InvalidDataException ex)
+                {
+                    // Display validation errors from PlateDataService
+                    await _dialogService.ShowMessageAsync("Data Validation Error", ex.Message);
+                }
+                catch (ApplicationException ex)
+                {
+                    // Display application-related errors
+                    await _dialogService.ShowMessageAsync("Application Error", ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    // Handle any unexpected errors
+                    await _dialogService.ShowMessageAsync("Unexpected Error", "An unexpected error occurred while loading the plate data.");
+                    // Optionally log the exception details for debugging
+                }
             }
         }
 
