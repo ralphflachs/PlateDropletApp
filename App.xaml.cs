@@ -4,6 +4,8 @@ using PlateDropletApp.ViewModels;
 using PlateDropletApp.Views;
 using System;
 using System.Windows;
+using DialogService = PlateDropletApp.Services.DialogService;
+using IDialogService = PlateDropletApp.Services.IDialogService;
 
 namespace PlateDropletApp
 {
@@ -28,6 +30,7 @@ namespace PlateDropletApp
         {
             services.AddSingleton<PlateDataService>();
             services.AddSingleton<IFileDialogService, FileDialogService>();
+            services.AddSingleton<IDialogService, DialogService>();
             services.AddTransient<MainWindowViewModel>();
             services.AddTransient<MainWindow>();
         }
