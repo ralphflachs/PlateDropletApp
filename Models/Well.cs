@@ -1,25 +1,12 @@
-﻿using Prism.Mvvm;
-
-namespace PlateDropletApp.Models
+﻿namespace PlateDropletApp.Models
 {
-    public class Well : BindableBase
+    public class Well
     {
-        private int _dropletCount;
-        private bool _isLowDroplet;
-
         public int WellIndex { get; set; }
         public string WellName { get; set; }
 
-        public int DropletCount
-        {
-            get => _dropletCount;
-            set => SetProperty(ref _dropletCount, value);
-        }
+        public int DropletCount { get; set; }
 
-        public bool IsLowDroplet
-        {
-            get => _isLowDroplet;
-            set => SetProperty(ref _isLowDroplet, value);
-        }
+        public bool IsLowDroplet { get; set; }
     }
 }
