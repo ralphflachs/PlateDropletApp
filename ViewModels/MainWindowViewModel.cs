@@ -15,7 +15,7 @@ using IDialogService = PlateDropletApp.Services.IDialogService;
 namespace PlateDropletApp.ViewModels
 {
     public class MainWindowViewModel : BindableBase, INotifyDataErrorInfo
-    {        
+    {
         private const int MinThreshold = 0;
         private const int MaxThreshold = 500;
         private const int DefaultFallbackThreshold = 100;
@@ -24,6 +24,12 @@ namespace PlateDropletApp.ViewModels
         private readonly IFileDialogService _fileDialogService;
         private readonly IDialogService _dialogService;
         private readonly ErrorsContainer<string> _errorsContainer;
+
+        public ObservableCollection<string> ColumnHeaders { get; }
+        public ObservableCollection<RowViewModel> PlateRows { get; }
+
+        public ICommand BrowseCommand { get; }
+        public ICommand UpdateThresholdCommand { get; }
 
         public MainWindowViewModel(PlateDataService plateDataService, IFileDialogService fileDialogService, IDialogService dialogService)
         {
@@ -38,6 +44,9 @@ namespace PlateDropletApp.ViewModels
             UpdateThresholdCommand = new DelegateCommand(OnUpdateThreshold);
 
             ValidateDropletThreshold();
+
+            ColumnHeaders = new ObservableCollection<string>();
+            PlateRows = new ObservableCollection<RowViewModel>();
         }
 
         #region Properties
@@ -46,7 +55,7 @@ namespace PlateDropletApp.ViewModels
         public Plate Plate
         {
             get => _plate;
-            set => SetProperty(ref _plate, value);
+            private set => SetProperty(ref _plate, value);
         }
 
         private string _dropletThresholdText;
@@ -78,12 +87,6 @@ namespace PlateDropletApp.ViewModels
 
         #endregion
 
-        public ObservableCollection<string> ColumnHeaders { get; set; }
-        public ObservableCollection<RowViewModel> PlateRows { get; set; }
-
-        public ICommand BrowseCommand { get; }
-        public ICommand UpdateThresholdCommand { get; }
-
         private int GetDefaultDropletThreshold()
         {
             string thresholdValue = ConfigurationManager.AppSettings["DefaultDropletThreshold"];
@@ -110,15 +113,15 @@ namespace PlateDropletApp.ViewModels
                     UpdateWellStatuses();
                 }
                 catch (InvalidDataException ex)
-                {                    
+                {
                     await _dialogService.ShowMessageAsync("Data Validation Error", ex.Message);
                 }
                 catch (ApplicationException ex)
-                {                    
+                {
                     await _dialogService.ShowMessageAsync("Application Error", ex.Message);
                 }
                 catch (Exception ex)
-                {                    
+                {
                     await _dialogService.ShowMessageAsync("Unexpected Error", "An unexpected error occurred while loading the plate data.");
                 }
             }
@@ -135,23 +138,24 @@ namespace PlateDropletApp.ViewModels
         private void InitializeHeadersAndRows()
         {
             // Initialize ColumnHeaders
-            ColumnHeaders = new ObservableCollection<string>();
+            ColumnHeaders.Clear();
             for (int i = 0; i < Plate.Columns; i++)
             {
                 char colHeader = (char)('A' + i);
                 ColumnHeaders.Add(colHeader.ToString());
             }
-            RaisePropertyChanged(nameof(ColumnHeaders));
 
             // Initialize PlateRows
-            PlateRows = new ObservableCollection<RowViewModel>();
+            PlateRows.Clear();
             for (int row = 0; row < Plate.Rows; row++)
             {
-                var rowWells = new ObservableCollection<Well>();
+                var rowWells = new ObservableCollection<WellViewModel>();
                 for (int col = 0; col < Plate.Columns; col++)
                 {
                     int index = row * Plate.Columns + col;
-                    rowWells.Add(Plate.Wells[index]);
+                    var well = Plate.Wells[index];
+                    var wellViewModel = new WellViewModel(well);
+                    rowWells.Add(wellViewModel);
                 }
                 PlateRows.Add(new RowViewModel
                 {
@@ -159,7 +163,6 @@ namespace PlateDropletApp.ViewModels
                     Cells = rowWells
                 });
             }
-            RaisePropertyChanged(nameof(PlateRows));
         }
 
         private void UpdateWellStatuses()
@@ -170,10 +173,10 @@ namespace PlateDropletApp.ViewModels
 
             foreach (var row in PlateRows)
             {
-                foreach (var well in row.Cells)
+                foreach (var wellVM in row.Cells)
                 {
-                    well.IsLowDroplet = well.DropletCount < thresholdValue;
-                    if (well.IsLowDroplet)
+                    wellVM.IsLowDroplet = wellVM.Well.DropletCount < thresholdValue;
+                    if (wellVM.IsLowDroplet)
                     {
                         lowDropletCount++;
                     }

@@ -1,10 +1,10 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
 
 namespace PlateDropletApp.Models
 {
     public class Plate
     {
-        public ObservableCollection<Well> Wells { get; set; } = new ObservableCollection<Well>();
+        public List<Well> Wells { get; set; } = new List<Well>();
         public int Rows { get; set; }
         public int Columns { get; set; }
     }

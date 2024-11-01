@@ -8,9 +8,20 @@ using System.Threading.Tasks;
 
 namespace PlateDropletApp.ViewModels
 {
-    public class RowViewModel
+    public class RowViewModel : BindableBase
     {
-        public string RowHeader { get; set; }
-        public ObservableCollection<Well> Cells { get; set; }
+        private string _rowHeader;
+        public string RowHeader
+        {
+            get => _rowHeader;
+            set => SetProperty(ref _rowHeader, value);
+        }
+
+        private ObservableCollection<WellViewModel> _cells;
+        public ObservableCollection<WellViewModel> Cells
+        {
+            get => _cells;
+            set => SetProperty(ref _cells, value);
+        }
     }
 }

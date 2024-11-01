@@ -77,8 +77,8 @@ namespace PlateDropletApp.Services
                     throw new InvalidDataException(
                         $"Well name mismatch at index {i}: expected '{expectedName}', but found '{well.WellName}'.");
                 }
-                
-                plate.Wells.Add(well);
+
+                plate.Wells.Add(well); // plate.Wells is now a List<Well>
             }
         }
 
